@@ -14,7 +14,7 @@ def mcVersions = [
         minecraft: '1.20.1',
         yarn     : '1.20.1+build.10',
         fabricApi: '0.92.9+1.20.1',
-        bbsJar   : 'libs/bbs-1.10.3.jar',
+        bbsJar   : 'libs/bbs-1.7.7.jar',
         sodium   : 'mc1.20.1-0.5.11',
         iris     : '1.7.2+1.20.1',
         lwjglPin : '3.3.1',

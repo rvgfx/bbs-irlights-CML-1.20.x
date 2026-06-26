@@ -32,5 +32,6 @@ public class BBSSettingsMixin
         // UISettingsOverlayPanelMixin). Empty category — buildSections still
         // shows it because it's visible.
         builder.category("irlite_patcher");
+        builder.getBoolean("_placeholder", false);
     }
 }
