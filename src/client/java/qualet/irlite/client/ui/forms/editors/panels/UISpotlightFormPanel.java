@@ -3,12 +3,14 @@ package qualet.irlite.client.ui.forms.editors.panels;
 import mchorse.bbs_mod.l10n.keys.IKey;
 import mchorse.bbs_mod.ui.forms.editors.forms.UIForm;
 import mchorse.bbs_mod.ui.forms.editors.panels.UIFormPanel;
+import mchorse.bbs_mod.ui.framework.elements.UISection;
 import mchorse.bbs_mod.ui.framework.elements.buttons.UIButton;
 import mchorse.bbs_mod.ui.framework.elements.buttons.UIToggle;
 import mchorse.bbs_mod.ui.framework.elements.input.UIColor;
 import mchorse.bbs_mod.ui.framework.elements.input.UITexturePicker;
 import mchorse.bbs_mod.ui.framework.elements.input.UITrackpad;
 import mchorse.bbs_mod.ui.utils.UI;
+import mchorse.bbs_mod.ui.utils.UIConstants;
 import mchorse.bbs_mod.utils.colors.Color;
 import qualet.irlite.forms.SpotlightForm;
 
@@ -41,7 +43,7 @@ public class UISpotlightFormPanel extends UIFormPanel<SpotlightForm>
         this.range = IrliteTrackpads.create((v) -> this.form.range.set(v.floatValue())).limit(0.1, 128);
         this.radius = IrliteTrackpads.create((v) -> this.form.radius.set(v.floatValue())).limit(1, 179);
         this.innerRadius = IrliteTrackpads.create((v) -> this.form.innerRadius.set(v.floatValue())).limit(1, 179);
-        this.beamStrength = IrliteTrackpads.create((v) -> this.form.beamStrength.set(v.floatValue())).limit(0, 5);
+        this.beamStrength = IrliteTrackpads.create((v) -> this.form.beamStrength.set(v.floatValue())).limit(0, 50);
         this.anisotropy = IrliteTrackpads.create((v) -> this.form.anisotropy.set(v.floatValue())).limit(-0.95, 0.95);
         this.vlDensity = IrliteTrackpads.create((v) -> this.form.vlDensity.set(v.floatValue())).limit(0.005, 0.5);
         this.bulbSize = IrliteTrackpads.create((v) -> this.form.bulbSize.set(v.floatValue())).limit(0, 2);
@@ -72,22 +74,46 @@ public class UISpotlightFormPanel extends UIFormPanel<SpotlightForm>
         this.cookieScale = IrliteTrackpads.create((v) -> this.form.cookieScale.set(v.floatValue())).limit(0.1, 4);
         this.cookieInvert = new UIToggle(IKey.constant("Invert gobo"), (b) -> this.form.cookieInvert.set(b.getValue()));
 
-        this.options.add(UI.label(IKey.constant("Color")), this.color);
-        this.options.add(UI.label(IKey.constant("Intensity")), this.intensity);
-        this.options.add(UI.label(IKey.constant("Range")), this.range);
-        this.options.add(UI.label(IKey.constant("Radius")), this.radius);
-        this.options.add(UI.label(IKey.constant("Inner radius")), this.innerRadius);
-        this.options.add(UI.label(IKey.constant("Beam strength")), this.beamStrength);
-        this.options.add(UI.label(IKey.constant("Anisotropy")), this.anisotropy);
-        this.options.add(UI.label(IKey.constant("VL density")), this.vlDensity);
-        this.options.add(UI.label(IKey.constant("Bulb size (shadow softness)")), this.bulbSize);
-        this.options.add(this.entitiesOnly);
-        this.options.add(this.blocksOnly);
-        this.options.add(this.shadows);
-        this.options.add(UI.label(IKey.constant("Cookie / gobo (spot mask)")), this.cookiePick);
-        this.options.add(UI.label(IKey.constant("Cookie rotation")), this.cookieRotation);
-        this.options.add(UI.label(IKey.constant("Cookie scale")), this.cookieScale);
-        this.options.add(this.cookieInvert);
+        UISection light = new UISection(IKey.constant("Light"));
+        light.fields.add(
+            UI.label(IKey.constant("Color")), this.color,
+            UI.label(IKey.constant("Intensity")), this.intensity,
+            UI.label(IKey.constant("Range")), this.range,
+            UI.label(IKey.constant("Radius")), this.radius,
+            UI.label(IKey.constant("Inner radius")), this.innerRadius
+        );
+
+        UISection volumetric = new UISection(IKey.constant("Volumetric beam"));
+        volumetric.fields.add(
+            UI.label(IKey.constant("Beam strength")), this.beamStrength,
+            UI.label(IKey.constant("Anisotropy")), this.anisotropy,
+            UI.label(IKey.constant("VL density")), this.vlDensity
+        );
+
+        UISection shadows = new UISection(IKey.constant("Shadows"));
+        shadows.fields.add(
+            this.shadows,
+            UI.label(IKey.constant("Bulb size (shadow softness)")), this.bulbSize
+        );
+
+        UISection affects = new UISection(IKey.constant("Affects"));
+        affects.fields.add(this.entitiesOnly, this.blocksOnly);
+
+        UISection cookie = new UISection(IKey.constant("Cookie / gobo (spot mask)"));
+        cookie.fields.add(
+            this.cookiePick,
+            UI.label(IKey.constant("Cookie rotation")), this.cookieRotation,
+            UI.label(IKey.constant("Cookie scale")), this.cookieScale,
+            this.cookieInvert
+        );
+
+        this.options.add(
+            light,
+            volumetric.marginTop(UIConstants.SECTION_GAP),
+            shadows.marginTop(UIConstants.SECTION_GAP),
+            affects.marginTop(UIConstants.SECTION_GAP),
+            cookie.marginTop(UIConstants.SECTION_GAP)
+        );
     }
 
     @Override
