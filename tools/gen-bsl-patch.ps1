@@ -8,7 +8,7 @@
 # <out> <Modification>` must be empty. See memory bsl-port-plan Phase 5.
 
 $ErrorActionPreference = "Stop"
-$repo = "C:\Users\Qualet\Documents\Project\Minecraft\BBS\IRLite"
+$repo = "C:\Users\Qualet\Documents\Project\Minecraft\BBS\bbs-irlights-addon"
 $mod  = "$repo\Shadres\Modification\BSL\shaders"
 $out  = "$repo\patches\bsl.irlights"
 
@@ -63,7 +63,7 @@ if (@($slLine).Count -ne 1) { throw "sliders line not unique" }
 $slIdx = $slLine.IndexOf('RETRO_FILTER_DEPTH WORLD_CURVATURE_SIZE')
 if ($slIdx -lt 0) { throw "sliders tail anchor not found" }
 $slBody = $slLine.Substring($slIdx)
-if (-not $slBody.EndsWith('IRLITE_OUTLINE_DEPTH_THRESHOLD')) { throw "sliders body tail unexpected" }
+if (-not $slBody.EndsWith('IRLITE_OUTLINE_GLOW_STRENGTH')) { throw "sliders body tail unexpected" }
 
 $lg = Lines "$mod\lang\en_US.lang"
 $Y = IndexOfLine $lg 'option.WHITE_WORLD.comment=Replaces textures with flat white color.'
@@ -115,6 +115,10 @@ Emit '# --- per-program flags: entity/hand/block lightMask gate + distant-LOD sk
 Emit '@file shaders/program/gbuffers_entities.glsl'
 Emit 'after "#ifdef FSH"'
 EmitBody @('#define IRLITE_NONTERRAIN // IRLite: entity/hand/block program (lightMask gate)')
+Emit 'replace "/* DRAWBUFFERS:01 */"'
+EmitBody @('/* DRAWBUFFERS:013 */')
+Emit 'after "    gl_FragData[1] = vec4(vlAlbedo, 1.0);"'
+EmitBody @('    gl_FragData[2] = vec4(0.0, 0.0, entityMask, 1.0); // colortex3.z: IRLite entity flag for outline target (MCBL/PBR branches below re-pin their own layout)')
 Emit '@file shaders/program/gbuffers_entities_glowing.glsl'
 Emit 'after "#ifdef FSH"'
 EmitBody @('#define IRLITE_NONTERRAIN // IRLite: entity/hand/block program (lightMask gate)')
@@ -133,6 +137,8 @@ EmitBody @('#define IRLITE_SKIP // IRLite: distant-LOD pass, IRLite lights stay 
 Emit ''
 Emit '# --- rim outline + volumetric upsample in composite ---'
 Emit '@file shaders/program/composite.glsl'
+Emit 'after "uniform sampler2D colortex1;"'
+EmitBody @('uniform sampler2D colortex3;')
 Emit 'after "#include \"/lib/atmospherics/waterFog.glsl\""'
 EmitBody @('', '#define IRLITE_COMPOSITE_PASS', '#include "/lib/irlite/irlite_lights.glsl"')
 Emit 'after "vec3 reflectionColor = pow(color.rgb, vec3(0.125)) * 0.5;"'
