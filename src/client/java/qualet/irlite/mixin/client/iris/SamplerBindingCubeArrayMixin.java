@@ -12,6 +12,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import qualet.irlite.client.light.cookie.CookieArray;
 import org.qualet.irl.light.shadow.PointShadowArray;
+import org.qualet.irl.light.shadow.PointShadowEvsm;
+import org.qualet.irl.light.shadow.PointShadowPyramid;
 
 import java.util.function.IntSupplier;
 
@@ -53,6 +55,24 @@ public abstract class SamplerBindingCubeArrayMixin
         if (cookieArrayId != 0 && id == cookieArrayId)
         {
             IrisRenderSystem.bindTextureToUnit(GL30.GL_TEXTURE_2D_ARRAY, this.textureUnit, id);
+            ci.cancel();
+            return;
+        }
+
+        // F1b: face-major point shadow pyramid is a 2D array too
+        int pointPyramidId = PointShadowPyramid.getGlTextureId();
+        if (pointPyramidId != 0 && id == pointPyramidId)
+        {
+            IrisRenderSystem.bindTextureToUnit(GL30.GL_TEXTURE_2D_ARRAY, this.textureUnit, id);
+            ci.cancel();
+            return;
+        }
+
+        // F2b: point MSM is sampled through a CUBE_MAP_ARRAY view (hardware-seamless face edges)
+        int pointEvsmId = PointShadowEvsm.getGlTextureId();
+        if (pointEvsmId != 0 && id == pointEvsmId)
+        {
+            IrisRenderSystem.bindTextureToUnit(GL40.GL_TEXTURE_CUBE_MAP_ARRAY, this.textureUnit, id);
             ci.cancel();
         }
     }
